@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "axios": "^1.6.8",
+    "mysql2": "^3.9.4",
     "ciudad-reporta": "file:..",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
