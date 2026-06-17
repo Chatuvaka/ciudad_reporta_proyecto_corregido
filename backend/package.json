@@ -4,7 +4,7 @@
   "description": "API REST para Ciudad Reporta",
   "main": "server.js",
   "engines": {
-    "node": ">=20.19.0 <21"
+    "node": ">=20.19.0 <23"
   },
   "scripts": {
     "start": "node server.js",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "ciudad-reporta": "file:..",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
