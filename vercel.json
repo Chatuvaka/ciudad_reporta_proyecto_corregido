@@ -9,9 +9,11 @@
     }
   },
   "rewrites": [
-    {      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
+    { "source": "/api/reportes/trabajador/:id/tomar", "destination": "/api/reportes/trabajador/acciones?action=tomar&id=:id" },
+    { "source": "/api/reportes/trabajador/:id/completar", "destination": "/api/reportes/trabajador/acciones?action=completar&id=:id" },
+    { "source": "/api/reportes/trabajador/:id/cancelar", "destination": "/api/reportes/trabajador/acciones?action=cancelar&id=:id" },
+    { "source": "/api/reportes/trabajador/:id", "destination": "/api/reportes/trabajador/acciones?action=getById&id=:id" },
+    { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
