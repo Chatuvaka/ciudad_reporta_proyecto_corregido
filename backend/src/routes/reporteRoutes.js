@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const {
+import {
   getReportes,
   createReporte,
   loginTrabajador,
@@ -10,11 +10,11 @@ const {
   completarReporte,
   cancelarReporte,
   verificarTrabajador,
-} = require('../controllers/reporteController');
-const {
+} from '../controllers/reporteController.js';
+import {
   loginRateLimiter,
   workerActionRateLimiter,
-} = require('../middlewares/rateLimiter');
+} from '../middlewares/rateLimiter.js';
 
 // Rutas públicas
 router.get('/reportes', getReportes);
@@ -30,4 +30,4 @@ router.patch('/trabajadores/reportes/:id/tomar', workerActionRateLimiter, verifi
 router.patch('/trabajadores/reportes/:id/completar', workerActionRateLimiter, verificarTrabajador, completarReporte);
 router.patch('/trabajadores/reportes/:id/cancelar', workerActionRateLimiter, verificarTrabajador, cancelarReporte);
 
-module.exports = router;
+export default router;

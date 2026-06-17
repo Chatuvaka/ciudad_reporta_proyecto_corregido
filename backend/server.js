@@ -1,8 +1,13 @@
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '.env') });
-const express = require('express');
-const cors    = require('cors');
-const reporteRoutes = require('./src/routes/reporteRoutes');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import reporteRoutes from './src/routes/reporteRoutes.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
@@ -74,10 +79,11 @@ app.use((err, req, res, next) => {
 });
 
 // ── Arranque local ───────────────────────────────────────
-if (require.main === module) {
+const isMain = process.argv[1] && path.resolve(process.argv[1]) === path.resolve(__filename);
+if (isMain) {
   app.listen(PORT, () => {
     console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
   });
 }
 
-module.exports = app;
+export default app;

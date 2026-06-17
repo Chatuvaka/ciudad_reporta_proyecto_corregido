@@ -1,6 +1,6 @@
-const crypto = require('crypto');
-const pool = require('../config/db');
-const { validarUbicacionReporteBackend, validarReferenciaLugarBackend, validarDescripcionProblemaBackend } = require('../services/locationValidator');
+import crypto from 'crypto';
+import pool from '../config/db.js';
+import { validarUbicacionReporteBackend, validarReferenciaLugarBackend, validarDescripcionProblemaBackend } from '../services/locationValidator.js';
 
 const TOKEN_SECRET = process.env.WORKER_TOKEN_SECRET
   || process.env.JWT_SECRET
@@ -104,20 +104,16 @@ function normalizeReportStatus(status) {
   return status || 'recibido';
 }
 
+import bcrypt from 'bcryptjs';
+
 function verifyPlainOrHashedPassword(inputPassword, storedPassword) {
   if (!inputPassword || !storedPassword) return false;
 
   // Compatibilidad con bases de datos creadas antes de migrar a bcrypt.
   if (inputPassword === storedPassword) return true;
 
-  try {
-    // eslint-disable-next-line global-require
-    const bcrypt = require('bcryptjs');
-    if (storedPassword.startsWith('$2a$') || storedPassword.startsWith('$2b$') || storedPassword.startsWith('$2y$')) {
-      return bcrypt.compareSync(inputPassword, storedPassword);
-    }
-  } catch (error) {
-    return false;
+  if (storedPassword.startsWith('$2a$') || storedPassword.startsWith('$2b$') || storedPassword.startsWith('$2y$')) {
+    return bcrypt.compareSync(inputPassword, storedPassword);
   }
 
   return false;
@@ -448,7 +444,7 @@ const cancelarReporte = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   getReportes,
   createReporte,
   loginTrabajador,

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "API REST para Ciudad Reporta",
   "main": "server.js",
+  "type": "module",
   "engines": {
     "node": ">=20.19.0 <23"
   },

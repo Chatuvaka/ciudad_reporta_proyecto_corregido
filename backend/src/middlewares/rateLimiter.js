@@ -47,8 +47,4 @@ const workerActionRateLimiter = createRateLimiter({
   message: 'Demasiadas acciones en poco tiempo. Espera un momento e intenta nuevamente.',
 });
 
-module.exports = {
-  loginRateLimiter,
-  reportCreateRateLimiter,
-  workerActionRateLimiter,
-};
+export { loginRateLimiter, reportCreateRateLimiter, workerActionRateLimiter };

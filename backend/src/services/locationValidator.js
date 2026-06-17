@@ -239,7 +239,7 @@ function validarUbicacionBasicaBackend(ubicacion) {
   return { valid: false, message: 'La ubicación está incompleta. Agrega número, colonia, cruce, esquina o una referencia cercana.' };
 }
 
-module.exports = {
+export {
   validarUbicacionBasicaBackend,
   validarReferenciaLugarBackend,
   validarDescripcionProblemaBackend,
@@ -298,5 +298,4 @@ function validarUbicacionReporteBackend(data = {}) {
     return { valid: false, message: 'Error al validar la ubicación.' };
   }
 }
-
-module.exports.validarUbicacionReporteBackend = validarUbicacionReporteBackend;
+export { validarUbicacionReporteBackend };

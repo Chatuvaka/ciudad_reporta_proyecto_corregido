@@ -1,7 +1,9 @@
-const fs   = require('fs');
-const path = require('path');
-const mysql = require('mysql2/promise');
-require('dotenv').config();
+import fs from 'fs';
+import path from 'path';
+import mysql from 'mysql2/promise';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const sslMode = process.env.DB_SSL_MODE;
 let sslOptions;
@@ -46,4 +48,4 @@ const pool = mysql.createPool({
   }
 })();
 
-module.exports = pool;
+export default pool;

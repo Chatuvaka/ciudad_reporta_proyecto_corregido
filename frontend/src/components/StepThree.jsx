@@ -78,9 +78,6 @@ function StepThree({ data, onBack, onSuccess }) {
       const response = await crearReporte({
         tipo:        data.tipo,
         ubicacion:   data.ubicacion,
-        direccion:   data.direccion,
-        estado:      data.estado || 'Sonora',
-        municipio:   data.municipio || 'San Luis Río Colorado',
         senas_lugar: data.referencia,
         referencia:  data.referencia,
         descripcion: data.descripcion,
