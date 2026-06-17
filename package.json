@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "npm run build --prefix frontend",
-    "start": "npm start --prefix backend"
+    "build": "npm run build --prefix frontend"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
