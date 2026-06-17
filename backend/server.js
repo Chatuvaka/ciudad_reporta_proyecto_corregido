@@ -6,6 +6,7 @@ const reporteRoutes = require('./src/routes/reporteRoutes');
 
 const app  = express();
 const PORT = process.env.PORT || 3001;
+const API_PREFIX = process.env.API_PREFIX || '/api';
 
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173')
   .split(',')
@@ -47,7 +48,7 @@ app.use(cors({
 app.use(express.json({ limit: '25kb' }));
 
 // ── Rutas ─────────────────────────────────────────────────
-app.use('/api', reporteRoutes);
+app.use(API_PREFIX, reporteRoutes);
 
 // ── Health check ──────────────────────────────────────────
 app.get('/', (req, res) => {

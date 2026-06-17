@@ -11,7 +11,12 @@ if (sslMode && sslMode.toUpperCase() !== 'DISABLED') {
   };
 
   if (process.env.DB_SSL_CA) {
-    sslOptions.ca = fs.readFileSync(path.resolve(process.env.DB_SSL_CA));
+    const sslCaPath = path.resolve(process.env.DB_SSL_CA);
+    if (fs.existsSync(sslCaPath)) {
+      sslOptions.ca = fs.readFileSync(sslCaPath, 'utf8');
+    } else {
+      sslOptions.ca = process.env.DB_SSL_CA;
+    }
   }
 }
 
