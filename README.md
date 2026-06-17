@@ -213,8 +213,14 @@ VITE_API_URL=http://localhost:3001/api
    - **Build Command:** `npm install`
    - **Start Command:** `npm start`
 5. En **Environment Variables**, agrega:
-   - `DB_HOST` → host de tu BD en Render o PlanetScale
-   - `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_PORT`
+   - `DB_HOST` → host de tu BD remota (por ejemplo Aiven)
+   - `DB_PORT` → puerto MySQL remoto
+   - `DB_USER` → usuario MySQL remoto
+   - `DB_PASSWORD` → contraseña MySQL remoto
+   - `DB_NAME` → nombre de la base de datos (por ejemplo `ciudad_reporta`)
+
+> Estas variables son necesarias para el endpoint serverless en `api/reportes.js`.
+
 6. Render te dará una URL pública tipo:
    `https://ciudad-reporta-api.onrender.com`
 
