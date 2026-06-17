@@ -2,12 +2,46 @@ import { useRef, useState } from 'react';
 import { crearReporte } from '../services/api';
 
 const TIPO_ICONOS = {
-  'Bache':               '🕳️',
-  'Luminaria dañada':    '💡',
-  'Fuga de agua':        '💧',
-  'Basura acumulada':    '🗑️',
-  'Señalización dañada': '🚧',
-  'Árbol caído':         '🌳',
+  'Bache': (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#6b5a4f]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="7" fill="#d5c4b4" />
+      <path d="M9 10c1-2 2-3 4-3s3 1 4 3" />
+      <path d="M8 14c1 1.5 2.5 2 4 2s3-0.5 4-2" />
+    </svg>
+  ),
+  'Luminaria dañada': (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#f1b850]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3a5 5 0 00-5 5c0 2 1.5 3.5 2.5 4 0 1 0 2 0 3h5c0-1 0-2 0-3 1-.5 2.5-2 2.5-4a5 5 0 00-5-5z" fill="#fbe9a7" />
+      <path d="M10 17h4" />
+      <path d="M9 20h6" />
+    </svg>
+  ),
+  'Fuga de agua': (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#3b99d9]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 4s-4 4-4 8 1.5 6 4 6 4-2.5 4-6-4-8-4-8z" fill="#9ccdec" />
+      <path d="M12 12c-1 1-1 2-1 2s0-1 1-2 1-2 1-2 0 1-1 2z" fill="#d7efff" />
+    </svg>
+  ),
+  'Basura acumulada': (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#7a5c47]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M7 7h10l-1 12H8L7 7z" fill="#d8c1b2" />
+      <path d="M9 7V5h6v2" />
+      <path d="M10 11v4" />
+      <path d="M14 11v4" />
+    </svg>
+  ),
+  'Señalización dañada': (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#d48a2d]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 3l7 7-7 7-7-7 7-7z" fill="#f8b250" />
+      <path d="M12 10v8" />
+    </svg>
+  ),
+  'Árbol caído': (
+    <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#4f9644]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M12 4c-3 0-5 2-5 5 0 2 1 3 2 4v4h6v-4c1-1 2-2 2-4 0-3-2-5-5-5z" fill="#8dc48f" />
+      <path d="M9 17h6" />
+    </svg>
+  ),
 };
 
 function StepThree({ data, onBack, onSuccess }) {
@@ -21,7 +55,12 @@ function StepThree({ data, onBack, onSuccess }) {
   });
 
   const items = [
-    { label: 'Tipo de incidencia', value: `${TIPO_ICONOS[data.tipo] || '📌'} ${data.tipo}` },
+    { label: 'Tipo de incidencia', value: data.tipo, icon: TIPO_ICONOS[data.tipo] || (
+        <svg viewBox="0 0 24 24" className="h-5 w-5 text-[#7a5c47]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="8" fill="#d8c1b2" />
+          <path d="M9 12l2 2 4-4" />
+        </svg>
+      ) },
     { label: 'Ubicación',          value: data.ubicacion },
     { label: 'Señas del Lugar',    value: data.referencia },
     { label: 'Descripción',        value: data.descripcion },
@@ -74,9 +113,12 @@ function StepThree({ data, onBack, onSuccess }) {
               <p className="uppercase tracking-[0.18em] a11y-desc mb-3 text-[var(--text-secondary)]">
                 {item.label}
               </p>
-              <p className="a11y-body font-semibold text-[var(--text-primary)] leading-7 break-words">
-                {item.value}
-              </p>
+              <div className="flex items-center gap-3">
+                {item.icon && <span className="flex h-8 w-8 items-center justify-center rounded-2xl bg-[#fff4e3] text-[var(--text-secondary)]">{item.icon}</span>}
+                <p className="a11y-body font-semibold text-[var(--text-primary)] leading-7 break-words">
+                  {item.value}
+                </p>
+              </div>
             </div>
           ))}
         </div>

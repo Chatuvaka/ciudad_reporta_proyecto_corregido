@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const pool = require('../config/db');
-const { validarUbicacionReporteBackend } = require('../services/locationValidator');
+const { validarUbicacionReporteBackend, validarReferenciaLugarBackend, validarDescripcionProblemaBackend } = require('../services/locationValidator');
 
 const TOKEN_SECRET = process.env.WORKER_TOKEN_SECRET
   || process.env.JWT_SECRET
@@ -174,6 +174,16 @@ const createReporte = async (req, res) => {
   if (!tipo) return res.status(400).json({ error: 'El campo "tipo" es obligatorio' });
   if (!descripcion) return res.status(400).json({ error: 'El campo "descripcion" es obligatorio' });
   if (descripcion.length < 10) return res.status(400).json({ error: 'La descripcion debe tener al menos 10 caracteres' });
+
+  const referenciaValidation = validarReferenciaLugarBackend(senasLugar);
+  if (!referenciaValidation.valid) {
+    return res.status(400).json({ error: referenciaValidation.message });
+  }
+
+  const descripcionValidation = validarDescripcionProblemaBackend(descripcion);
+  if (!descripcionValidation.valid) {
+    return res.status(400).json({ error: descripcionValidation.message });
+  }
 
   const structured = {
     direccion: cleanText(ubicacion || body.direccion, 255),

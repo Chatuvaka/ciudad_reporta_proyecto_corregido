@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { validarUbicacionReporte } from '../services/locationValidator';
+import { validarUbicacionBasica, validarUbicacionReporte, validarReferenciaLugar, validarDescripcionProblema } from '../services/locationValidator';
 
 function StepTwo({ data, setData, onNext, onBack }) {
   const [errorUbicacion, setErrorUbicacion] = useState('');
   const [validating, setValidating] = useState(false);
   const [showValidation, setShowValidation] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [touched, setTouched] = useState({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const hasValue = (value) => String(value || '').trim().length > 0;
 
@@ -23,21 +25,36 @@ function StepTwo({ data, setData, onNext, onBack }) {
     if ((field === 'direccion' || field === 'referencia') && errorUbicacion) {
       setErrorUbicacion('');
     }
+
+    if (touched[field] || submitAttempted) {
+      const partial = validateFormData({ ...data, [field]: value });
+      setFieldErrors(partial);
+    }
   };
 
-  const getVisualErrors = () => {
+  const handleBlur = (field) => {
+    setTouched((current) => ({ ...current, [field]: true }));
+    const partial = validateFormData(data);
+    setFieldErrors(partial);
+  };
+
+  const validateFormData = (values) => {
+    const current = values || data;
     const errors = {};
 
-    if (!hasValue(data.direccion)) {
-      errors.direccion = 'La ubicación es obligatoria.';
+    const ubicacionRes = validarUbicacionBasica(current.direccion);
+    if (!ubicacionRes.valid) {
+      errors.direccion = ubicacionRes.message;
     }
 
-    if (!hasValue(data.referencia)) {
-      errors.referencia = 'Agrega señas del lugar para ubicar mejor el problema.';
+    const referenciaRes = validarReferenciaLugar(current.referencia);
+    if (!referenciaRes.valid) {
+      errors.referencia = referenciaRes.message;
     }
 
-    if (!hasValue(data.descripcion)) {
-      errors.descripcion = 'La descripción del problema es obligatoria.';
+    const descripcionRes = validarDescripcionProblema(current.descripcion);
+    if (!descripcionRes.valid) {
+      errors.descripcion = descripcionRes.message;
     }
 
     return errors;
@@ -46,13 +63,22 @@ function StepTwo({ data, setData, onNext, onBack }) {
   const handleNext = () => {
     if (validating) return;
 
+    setSubmitAttempted(true);
     setShowValidation(true);
     setErrorUbicacion('');
 
-    const visualErrors = getVisualErrors();
-    setFieldErrors(visualErrors);
+    const errors = validateFormData(data);
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
-    if (Object.keys(visualErrors).length > 0) return;
+    const direccionRes = validarUbicacionBasica(data.direccion);
+    if (!direccionRes.valid) {
+      setFieldErrors((current) => ({
+        ...current,
+        direccion: direccionRes.message,
+      }));
+      return;
+    }
 
     setValidating(true);
 
@@ -120,6 +146,28 @@ function StepTwo({ data, setData, onNext, onBack }) {
     return `${inputBaseClass} ${stateClass} ${extra}`;
   };
 
+  const getCharCounter = (value = '', max) => {
+    const length = String(value || '').trim().length;
+    const safeLength = length > max ? max : length;
+    return `${safeLength} / ${max}`;
+  };
+
+  const formSummary = () => {
+    const errors = validateFormData(data);
+    if (Object.keys(errors).length === 0 || !submitAttempted) return null;
+
+    return (
+      <div className="rounded-3xl border border-red-200 bg-red-50/70 p-4 text-[18px] text-red-800">
+        <p className="font-semibold">Revisa estos problemas antes de continuar:</p>
+        <ul className="mt-2 list-disc space-y-1 pl-5">
+          {Object.values(errors).map((message, index) => (
+            <li key={index}>{message}</li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
   const fieldError = (fieldName) => (
     showValidation && fieldErrors[fieldName] ? (
       <p role="alert" className="mt-2 text-[18px] font-semibold leading-snug text-red-700">
@@ -136,6 +184,8 @@ function StepTwo({ data, setData, onNext, onBack }) {
       </div>
 
       <div className="grid gap-6">
+        {formSummary()}
+
         {field(
           'Ubicación',
           true,
@@ -145,10 +195,15 @@ function StepTwo({ data, setData, onNext, onBack }) {
               placeholder="Calle, colonia, cruce o punto de referencia"
               value={data.direccion || ''}
               onChange={(e) => updateField('direccion', e.target.value)}
+              onBlur={() => handleBlur('direccion')}
               className={inputClass('direccion')}
               aria-invalid={showValidation && fieldErrors.direccion ? 'true' : 'false'}
               aria-describedby={errorUbicacion ? 'ubic-error' : 'ubic-help'}
             />
+            <div className="mt-2 flex items-center justify-between gap-3 text-sm text-[#7d614a]">
+              <p>Ejemplo: Calle 20 #123, Colonia Comercial.</p>
+              <span>{getCharCounter(data.direccion, 120)}</span>
+            </div>
             {fieldError('direccion')}
             {errorUbicacion && (
               <p id="ubic-error" role="alert" className="mt-3 text-[#7a2f24] text-[20px] font-semibold leading-snug">
@@ -156,7 +211,7 @@ function StepTwo({ data, setData, onNext, onBack }) {
               </p>
             )}
           </>,
-          'Ejemplo: Calle 20 #123, Colonia Comercial.'
+          ''
         )}
 
         {field(
@@ -168,12 +223,17 @@ function StepTwo({ data, setData, onNext, onBack }) {
               placeholder="Ej. frente a la plaza, esquina con avenida principal"
               value={data.referencia || ''}
               onChange={(e) => updateField('referencia', e.target.value)}
+              onBlur={() => handleBlur('referencia')}
               className={inputClass('referencia')}
               aria-invalid={showValidation && fieldErrors.referencia ? 'true' : 'false'}
             />
+            <div className="mt-2 flex items-center justify-between gap-3 text-sm text-[#7d614a]">
+              <p>Agrega una referencia visible para que el equipo ubique la incidencia.</p>
+              <span>{getCharCounter(data.referencia, 200)}</span>
+            </div>
             {fieldError('referencia')}
           </>,
-          'Agrega una referencia visible para que el equipo ubique la incidencia.'
+          ''
         )}
 
         {field(
@@ -184,13 +244,18 @@ function StepTwo({ data, setData, onNext, onBack }) {
               placeholder="Describe el problema con el mayor detalle posible..."
               value={data.descripcion || ''}
               onChange={(e) => updateField('descripcion', e.target.value)}
+              onBlur={() => handleBlur('descripcion')}
               rows={6}
               className={inputClass('descripcion', 'resize-none min-h-[190px] a11y-input-large')}
               aria-invalid={showValidation && fieldErrors.descripcion ? 'true' : 'false'}
             />
+            <div className="mt-2 flex items-center justify-between gap-3 text-sm text-[#7d614a]">
+              <p>Incluye detalles como tamaño, riesgo, horario o condiciones observadas.</p>
+              <span>{getCharCounter(data.descripcion, 500)}</span>
+            </div>
             {fieldError('descripcion')}
           </>,
-          'Incluye detalles como tamaño, riesgo, horario o condiciones observadas.'
+          ''
         )}
 
         {field(

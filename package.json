@@ -5,5 +5,8 @@
   "scripts": {
     "build": "npm run build --prefix frontend",
     "start": "npm start --prefix backend"
+  },
+  "dependencies": {
+    "mysql2": "^3.9.4"
   }
 }

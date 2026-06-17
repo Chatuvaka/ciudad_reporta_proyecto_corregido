@@ -33,6 +33,21 @@ const STATUS_FILTERS = [
   },
 ];
 
+function formatDate(value) {
+  if (!value) return 'Sin fecha';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return date.toLocaleString('es-MX', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function WorkerReportsPage() {
   const navigate = useNavigate();
   const [reports, setReports] = useState([]);
@@ -230,7 +245,7 @@ function WorkerReportsPage() {
                     <span className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold ${statusClasses}`}>
                       {statusLabel}
                     </span>
-                    <p className="text-sm text-slate-500">{report.fecha || report.fecha_creacion}</p>
+                    <p className="text-sm text-slate-500">{formatDate(report.fecha || report.fecha_creacion)}</p>
                   </div>
                 </div>
 

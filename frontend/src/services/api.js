@@ -21,7 +21,9 @@ export function isWorkerTokenValid(token = localStorage.getItem('workerToken')) 
   }
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:3001/api');
+const apiBaseUrl = import.meta.env.PROD
+  ? '/api'
+  : (import.meta.env.VITE_API_URL || 'http://localhost:3001/api');
 
 const api = axios.create({
   baseURL: apiBaseUrl,

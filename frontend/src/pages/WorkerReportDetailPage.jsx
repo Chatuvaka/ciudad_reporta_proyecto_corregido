@@ -9,6 +9,21 @@ import {
   takeReport,
 } from '../services/workerReportsService';
 
+function formatDate(value) {
+  if (!value) return 'Sin fecha';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return date.toLocaleString('es-MX', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function WorkerReportDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -159,7 +174,7 @@ function WorkerReportDetailPage() {
             )}
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#7d614a]">Fecha de creación</p>
-              <p className="mt-3 text-base leading-7 text-slate-700">{report.fecha || report.fecha_creacion}</p>
+              <p className="mt-3 text-base leading-7 text-slate-700">{formatDate(report.fecha || report.fecha_creacion)}</p>
             </div>
             {report.estado === 'cancelado' && report.motivo_cancelacion && (
               <div>

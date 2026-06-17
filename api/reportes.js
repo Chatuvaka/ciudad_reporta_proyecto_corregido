@@ -1,50 +1,36 @@
-const mysql = require('mysql2/promise');
-const fs = require('fs');
-const path = require('path');
+import { query as dbQuery } from '../lib/db.js';
 
-let pool;
-function getPool() {
-  if (pool) return pool;
-
-  const sslMode = process.env.DB_SSL_MODE;
-  let sslOptions;
-  if (sslMode && sslMode.toUpperCase() !== 'DISABLED') {
-    sslOptions = { rejectUnauthorized: sslMode.toUpperCase() === 'VERIFY_IDENTITY' };
-    if (process.env.DB_SSL_CA) {
-      const p = path.resolve(process.env.DB_SSL_CA);
-      if (fs.existsSync(p)) sslOptions.ca = fs.readFileSync(p, 'utf8');
-      else sslOptions.ca = process.env.DB_SSL_CA;
-    }
-  }
-
-  pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    ssl: sslOptions,
-    waitForConnections: true,
-    connectionLimit: 5,
-    queueLimit: 0,
-  });
-
-  return pool;
-}
-
-module.exports = async (req, res) => {
-  if (req.method !== 'GET') {
-    res.status(405).json({ error: 'method_not_allowed' });
-    return;
-  }
-
+export default async function handler(req, res) {
   try {
-    const pool = getPool();
-    const [rows] = await pool.query('SELECT * FROM reportes ORDER BY fecha_creacion DESC');
-    res.setHeader('Content-Type', 'application/json');
-    res.status(200).json(rows);
+    if (req.method === 'GET') {
+      const [rows] = await dbQuery('SELECT * FROM reportes ORDER BY fecha_creacion DESC', []);
+      res.status(200).json(rows);
+      return;
+    }
+
+    if (req.method === 'POST') {
+      const { tipo, ubicacion, senas_lugar, descripcion, ciudadano, estado } = req.body || {};
+
+      if (!tipo || !ubicacion || !descripcion) {
+        res.status(400).json({ error: 'validation_error', message: 'Campos obligatorios: tipo, ubicacion, descripcion' });
+        return;
+      }
+
+      const user = ciudadano || 'Anónimo';
+      const st = estado || 'pendiente';
+
+      const sql = 'INSERT INTO reportes (tipo, ubicacion, senas_lugar, descripcion, ciudadano, estado, fecha_creacion) VALUES (?, ?, ?, ?, ?, ?, NOW())';
+      const params = [tipo, ubicacion, senas_lugar || null, descripcion, user, st];
+
+      const [result] = await dbQuery(sql, params);
+      res.status(201).json({ insertedId: result.insertId });
+      return;
+    }
+
+    res.setHeader('Allow', 'GET,POST');
+    res.status(405).json({ error: 'method_not_allowed' });
   } catch (err) {
-    console.error('Error querying reportes:', err);
-    res.status(500).json({ error: 'db_error', message: err.message });
+    console.error('api/reportes error', err);
+    res.status(500).json({ error: 'server_error', message: err.message });
   }
-};
+}
