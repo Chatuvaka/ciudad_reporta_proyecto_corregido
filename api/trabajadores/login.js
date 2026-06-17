@@ -69,7 +69,16 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = req.body || {};
+    let body = {};
+
+    if ('body' in req) {
+      try {
+        body = req.body || {};
+      } catch (err) {
+        body = {};
+      }
+    }
+
     const parsedBody = Object.keys(body).length ? body : await parseJsonBody(req);
     const correo = cleanText(parsedBody.correo || parsedBody.email, 150).toLowerCase();
     const password = cleanText(parsedBody.password || parsedBody.contrasena || parsedBody.contraseña, 200);
