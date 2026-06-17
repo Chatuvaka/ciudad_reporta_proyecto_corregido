@@ -31,6 +31,26 @@ function cleanText(value, maxLength) {
   return String(value || '').trim().slice(0, maxLength);
 }
 
+function parseJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let raw = '';
+    req.on('data', (chunk) => {
+      raw += chunk.toString();
+    });
+    req.on('end', () => {
+      if (!raw) {
+        return resolve({});
+      }
+      try {
+        resolve(JSON.parse(raw));
+      } catch (err) {
+        reject(err);
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
 function verifyPlainOrHashedPassword(inputPassword, storedPassword) {
   if (!inputPassword || !storedPassword) return false;
   if (inputPassword === storedPassword) return true;
@@ -50,8 +70,9 @@ export default async function handler(req, res) {
 
   try {
     const body = req.body || {};
-    const correo = cleanText(body.correo || body.email, 150).toLowerCase();
-    const password = cleanText(body.password || body.contrasena || body.contraseña, 200);
+    const parsedBody = Object.keys(body).length ? body : await parseJsonBody(req);
+    const correo = cleanText(parsedBody.correo || parsedBody.email, 150).toLowerCase();
+    const password = cleanText(parsedBody.password || parsedBody.contrasena || parsedBody.contraseña, 200);
 
     if (!correo || !password) {
       return res.status(400).json({ error: true, message: 'Correo y contraseña son obligatorios.' });
@@ -94,6 +115,11 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('trabajadores/login error:', error);
+
+    if (error instanceof SyntaxError) {
+      return res.status(400).json({ error: true, message: 'JSON inválido en la petición.' });
+    }
+
     return res.status(500).json({ error: true, message: 'Error interno al iniciar sesión.' });
   }
 }
