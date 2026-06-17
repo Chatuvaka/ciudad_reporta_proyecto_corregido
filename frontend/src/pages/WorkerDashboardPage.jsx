@@ -14,7 +14,11 @@ function WorkerDashboardPage() {
         setLoading(true);
         setError('');
         const data = await getWorkerReports();
-        setReports(data);
+        if (Array.isArray(data)) {
+          setReports(data);
+        } else {
+          throw new Error('La ruta de la API no está disponible en el servidor (Devolvió HTML).');
+        }
       } catch (err) {
         if (err.response?.status === 401) {
           localStorage.removeItem('workerToken');
