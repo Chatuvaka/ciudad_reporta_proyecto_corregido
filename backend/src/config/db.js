@@ -39,8 +39,10 @@ const pool = mysql.createPool({
     console.log('✅ Conexión a MySQL establecida');
     conn.release();
   } catch (err) {
-    console.error('❌ Error al conectar con MySQL:', err.message);
-    process.exit(1);
+    console.error('❌ Error al conectar con MySQL (inicial):', err.message);
+    // No terminamos el proceso aquí: en entornos serverless (Vercel) queremos
+    // permitir que la función se despliegue. Las conexiones se intentarán
+    // cuando lleguen las peticiones.
   }
 })();
 
