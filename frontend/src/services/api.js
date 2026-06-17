@@ -1,4 +1,4 @@
-﻿import axios from "axios";
+import axios from "axios";
 
 export function clearWorkerSession() {
   localStorage.removeItem('workerToken');
@@ -53,9 +53,9 @@ export const crearReporte = (data) => api.post('/reportes', data);
 export const obtenerReportes = () => api.get('/reportes');
 export const loginTrabajador = (data) => api.post('/trabajadores/login', data);
 export const obtenerReportesTrabajador = () => api.get('/reportes/trabajador');
-export const obtenerReporteTrabajadorPorId = (id) => api.get(`/reportes/trabajador/${id}`);
-export const tomarReporteTrabajador = (id) => api.post(`/reportes/trabajador/${id}/tomar`);
-export const completarReporteTrabajador = (id) => api.post(`/reportes/trabajador/${id}/completar`);
-export const cancelarReporteTrabajador = (id) => api.post(`/reportes/trabajador/${id}/cancelar`);
+export const obtenerReporteTrabajadorPorId = (id) => api.get(`/reportes/trabajador/acciones?action=getById&id=${id}`);
+export const tomarReporteTrabajador = (id) => api.post(`/reportes/trabajador/acciones`, { action: 'tomar', id });
+export const completarReporteTrabajador = (id) => api.post(`/reportes/trabajador/acciones`, { action: 'completar', id });
+export const cancelarReporteTrabajador = (id, body) => api.post(`/reportes/trabajador/acciones`, { action: 'cancelar', id, motivo: body?.motivo });
 
 export default api;
