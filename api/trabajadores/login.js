@@ -2,30 +2,7 @@ import pool from '../../lib/db.js';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 
-const TOKEN_SECRET = process.env.WORKER_TOKEN_SECRET || process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
-
-function base64UrlEncode(value) {
-  return Buffer.from(JSON.stringify(value)).toString('base64url');
-}
-
-function signPayload(payload) {
-  return crypto
-    .createHmac('sha256', TOKEN_SECRET)
-    .update(payload)
-    .digest('base64url');
-}
-
-function createWorkerToken(trabajador) {
-  const payload = base64UrlEncode({
-    id: trabajador.id,
-    nombre: trabajador.nombre,
-    correo: trabajador.correo,
-    exp: Date.now() + 8 * 60 * 60 * 1000,
-  });
-
-  const signature = signPayload(payload);
-  return `${payload}.${signature}`;
-}
+import { createWorkerToken } from '../../lib/auth.js';
 
 function cleanText(value, maxLength) {
   return String(value || '').trim().slice(0, maxLength);
