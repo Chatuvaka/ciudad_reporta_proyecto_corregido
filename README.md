@@ -100,6 +100,34 @@ SOURCE /ruta/a/ciudad-reporta/ciudad_reporta.sql;
 
 ---
 
+### Aiven / MySQL remoto
+
+Si usas Aiven, crea un servicio MySQL y copia los datos de conexión. Para importar el esquema, usa un cliente MySQL local con SSL:
+
+```bash
+mysql --ssl-mode=VERIFY_IDENTITY \
+  --ssl-ca=/ruta/a/ca.pem \
+  -h <AIVEN_HOST> \
+  -P <AIVEN_PORT> \
+  -u <AIVEN_USER> \
+  -p \
+  ciudad_reporta < ciudad_reporta.sql
+```
+
+Luego configura `backend/.env` con:
+
+```env
+DB_HOST=<AIVEN_HOST>
+DB_PORT=<AIVEN_PORT>
+DB_USER=<AIVEN_USER>
+DB_PASSWORD=<AIVEN_PASSWORD>
+DB_NAME=ciudad_reporta
+DB_SSL_MODE=VERIFY_IDENTITY
+DB_SSL_CA=/ruta/a/ca.pem
+```
+
+---
+
 ### 2. Backend
 
 ```bash

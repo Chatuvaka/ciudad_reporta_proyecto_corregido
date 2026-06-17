@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const cors    = require('cors');
 const reporteRoutes = require('./src/routes/reporteRoutes');
@@ -10,6 +11,14 @@ const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http:/
   .split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
+
+if (process.env.VERCEL_URL) {
+  allowedOrigins.push(`https://${process.env.VERCEL_URL}`);
+}
+
+if (process.env.VERCEL_BRANCH_URL) {
+  allowedOrigins.push(`https://${process.env.VERCEL_BRANCH_URL}`);
+}
 
 // ── Middlewares ────────────────────────────────────────────
 app.disable('x-powered-by');
@@ -63,7 +72,11 @@ app.use((err, req, res, next) => {
   return res.status(500).json({ error: true, message: 'Error interno del servidor.' });
 });
 
-// ── Arranque ──────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-});
+// ── Arranque local ───────────────────────────────────────
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
