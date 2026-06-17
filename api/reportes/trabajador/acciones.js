@@ -23,7 +23,8 @@ export default async function handler(req, res) {
 
     if (req.method === 'POST') {
       const body = req.body || await parseJsonBody(req);
-      const { action, id } = body;
+      const action = body.action || req.query.action;
+      const id = body.id || req.query.id;
       const reporteId = parsePositiveId(id);
       if (!reporteId) return res.status(400).json({ error: true, message: 'ID invalido.' });
 
